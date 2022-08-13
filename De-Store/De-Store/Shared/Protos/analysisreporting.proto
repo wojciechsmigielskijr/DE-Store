@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "De_Store.Shared.Protos";
+
+package analysisreporting;
+
+// The greeting service definition.
+service AnalysisReporter {
+  // Sends a greeting
+  rpc LogPurchase (PurchaseDoneRequest) returns (PurchaseDoneReply);
+}
+
+// The request message containing the user's name.
+message PurchaseDoneRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings.
+message PurchaseDoneReply {
+  string message = 1;
+}

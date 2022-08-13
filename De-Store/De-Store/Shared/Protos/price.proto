@@ -1,0 +1,23 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "De_Store.Shared.Protos";
+
+package price;
+
+// The greeting service definition.
+service PriceManager {
+  // Sends a greeting
+  rpc ChangePrice (SetPriceRequest) returns (SetPriceReply);
+}
+
+// The request message containing the user's name.
+message SetPriceRequest {
+  int32 item_id = 1;
+  float new_price = 2;
+}
+
+// The response message containing the greetings.
+message SetPriceReply {
+  string message = 1;
+}
+

@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "De_Store.Shared.Protos";
+
+package loyalty;
+
+service LoyaltyManager {
+  rpc CheckLoyatyPoints (LoyatyPointsRequest) returns (LoyatyPointsReply);
+}
+
+message LoyatyPointsRequest {
+  string name = 1;
+}
+
+message LoyatyPointsReply {
+  string message = 1;
+}

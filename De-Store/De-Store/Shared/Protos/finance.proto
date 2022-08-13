@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "De_Store.Shared.Protos";
+
+package finanace;
+
+// The greeting service definition.
+service FinanceManager {
+  // Sends a greeting
+  rpc OfferEnabling (EnablingRequest) returns (EnablingReply);
+}
+
+// The request message containing the user's name.
+message EnablingRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings.
+message EnablingReply {
+  string message = 1;
+}

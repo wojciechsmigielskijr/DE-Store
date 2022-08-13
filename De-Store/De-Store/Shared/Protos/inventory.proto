@@ -1,0 +1,59 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "De_Store.Shared.Protos";
+
+package inventory;
+
+service InventoryManager {
+  rpc CheckStock (CheckStockRequest) returns (stream CheckStockReply);
+  rpc GetProducts (GetProductsRequest) returns (stream GetProductsReply);
+  rpc UpdatePrice (UpdatePriceRequest) returns (UpdatePriceReply);
+  rpc UpdateOffer (UpdateOfferRequest) returns (UpdateOfferReply);
+  rpc UpdateAvailable (UpdateAvailableRequest) returns (UpdateAvailableReply);
+}
+
+//Get Stock
+message CheckStockRequest {
+}
+
+message CheckStockReply {
+	int32 stockAmount = 1;
+	int32 productItemID = 2;
+}
+
+//Get Products
+message GetProductsRequest {
+
+}
+
+message GetProductsReply {
+	int32 productID = 1;
+	string productType = 2;
+	string productDescription = 3;
+	double productCost = 4;
+	bool availableToBuy = 5;
+}
+
+message UpdatePriceRequest {
+	int32 productID = 1;
+	double productCost = 2;
+}
+
+message UpdatePriceReply {
+}
+
+message UpdateOfferRequest {
+	int32 productID = 1;
+	string offerType = 2;
+}
+
+message UpdateOfferReply {
+}
+
+message UpdateAvailableRequest {
+	int32 productID = 1;
+	bool availableToBuy = 2;
+}
+
+message UpdateAvailableReply {
+}

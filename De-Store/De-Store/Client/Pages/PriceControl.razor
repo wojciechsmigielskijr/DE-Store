@@ -1,0 +1,96 @@
+﻿@page "/PriceControl"
+@using De_Store.Shared.Models
+@using De_Store.Shared.Protos
+@using Google.Protobuf.WellKnownTypes
+@using Grpc.Core
+@inject InventoryManager.InventoryManagerClient invManager
+
+<PageTitle>Price Control</PageTitle>
+
+<h1>Price Control</h1>
+
+@if (showEditDialog)
+{
+    <form>
+
+    </form>
+}
+
+@if (products.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Type</th>
+                <th>Product Description</th>
+                <th>Product Cost</th>
+                <th>Allow Users to buy</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in products)
+            {
+                <tr @key="@p">
+                    <td id="ProductID" value="@p.ProductID" hidden></td>
+                    <td>@p.ProductType</td>
+                    <td>@p.ProductDescription</td>
+                    <td><input value="@p.ProductCost" @onchange="(e) => {RowChangedID = p.ProductID; NewCost = Convert.ToDouble(e.Value); ChangePrice(p);}"></td>
+                    <td><input type="checkbox" @key="@p.ProductID" checked="@p.AvailableToBuy" @onchange="(e) => {NewCheckboxValue = (bool)e.Value; ToggleAvailableToBuy(p);}"/></td>
+                    <td><button onclick="">Save</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Product> products = new();
+    private bool showEditDialog = false;
+    private bool NewCheckboxValue = false;
+    private int? RowChangedID = null;
+    private double NewCost;
+
+    private void ToggleShowEditDialog(int id)
+    {
+        if (showEditDialog)
+        {
+            showEditDialog = false;
+        }
+        else
+        {
+
+            showEditDialog = false;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var myProducts = invManager.GetProducts(new GetProductsRequest());
+
+        while (await myProducts.ResponseStream.MoveNext())
+        {
+            products.Add(
+                new Product(myProducts.ResponseStream.Current.ProductID,
+                myProducts.ResponseStream.Current.ProductType,
+                myProducts.ResponseStream.Current.ProductDescription,
+                myProducts.ResponseStream.Current.ProductCost,
+                myProducts.ResponseStream.Current.AvailableToBuy
+            ));
+        }
+    }
+
+    private async Task ToggleAvailableToBuy(Product p)
+    {
+        await invManager.UpdateAvailableAsync(new UpdateAvailableRequest() { ProductID = p.ProductID, AvailableToBuy = NewCheckboxValue });
+    }
+
+    private async Task ChangePrice(Product p)
+    {
+        if(NewCost != p.ProductCost)
+        {
+           await invManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost });
+        }
+    }
+
+}
