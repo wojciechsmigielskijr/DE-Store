@@ -1,5 +1,7 @@
 ﻿syntax = "proto3";
 
+import "google/protobuf/wrappers.proto";
+
 option csharp_namespace = "De_Store.Shared.Protos";
 
 package inventory;
@@ -32,6 +34,7 @@ message GetProductsReply {
 	string productDescription = 3;
 	double productCost = 4;
 	bool availableToBuy = 5;
+	google.protobuf.Int32Value productStock = 6;
 }
 
 message UpdatePriceRequest {

@@ -8,6 +8,7 @@
 <PageTitle>Price Control</PageTitle>
 
 <h1>Price Control</h1>
+<button @onclick="GetMyProducts">Refresh Items</button>
 
 @if (showEditDialog)
 {
@@ -25,6 +26,7 @@
                 <th>Product Description</th>
                 <th>Product Cost</th>
                 <th>Allow Users to buy</th>
+                <th>Stock</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -35,8 +37,9 @@
                     <td id="ProductID" value="@p.ProductID" hidden></td>
                     <td>@p.ProductType</td>
                     <td>@p.ProductDescription</td>
-                    <td><input value="@p.ProductCost" @onchange="(e) => {RowChangedID = p.ProductID; NewCost = Convert.ToDouble(e.Value); ChangePrice(p);}"></td>
-                    <td><input type="checkbox" @key="@p.ProductID" checked="@p.AvailableToBuy" @onchange="(e) => {NewCheckboxValue = (bool)e.Value; ToggleAvailableToBuy(p);}"/></td>
+                    <td><input value="@p.ProductCost" @onchange="(e) => { RowChangedID = p.ProductID; NewCost = Convert.ToDouble(e.Value); ChangePrice(p); }"></td>
+                    <td><input type="checkbox" @key="@p.ProductID" checked="@p.AvailableToBuy" @onchange="(e) => { NewCheckboxValue = Convert.ToBoolean(e.Value); ToggleAvailableToBuy(p); }"/></td>
+                    <td>@p.Stock</td>
                     <td><button onclick="">Save</button></td>
                 </tr>
             }
@@ -51,21 +54,15 @@
     private int? RowChangedID = null;
     private double NewCost;
 
-    private void ToggleShowEditDialog(int id)
-    {
-        if (showEditDialog)
-        {
-            showEditDialog = false;
-        }
-        else
-        {
-
-            showEditDialog = false;
-        }
-    }
-
     protected override async Task OnInitializedAsync()
     {
+        await GetMyProducts();
+    }
+
+    private async Task GetMyProducts()
+    {
+        products.Clear();
+
         using var myProducts = invManager.GetProducts(new GetProductsRequest());
 
         while (await myProducts.ResponseStream.MoveNext())
@@ -75,7 +72,8 @@
                 myProducts.ResponseStream.Current.ProductType,
                 myProducts.ResponseStream.Current.ProductDescription,
                 myProducts.ResponseStream.Current.ProductCost,
-                myProducts.ResponseStream.Current.AvailableToBuy
+                myProducts.ResponseStream.Current.AvailableToBuy,
+                myProducts.ResponseStream.Current.ProductStock
             ));
         }
     }
@@ -88,9 +86,7 @@
     private async Task ChangePrice(Product p)
     {
         if(NewCost != p.ProductCost)
-        {
-           await invManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost });
-        }
+        { await invManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost }); }
     }
 
 }

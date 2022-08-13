@@ -39,7 +39,7 @@ namespace De_Store.Server.Models
         {
             DatabaseManager myDBManager = new();
 
-            string commandText = "SELECT ID, ProductType, ProductDescription, ProductCost, AvailableToBuy FROM [De-Store].[dbo].[Products]";
+            string commandText = "SELECT ID, ProductType, ProductDescription, ProductCost, AvailableToBuy, W.Stock FROM [De-Store].[dbo].[Products] P FULL JOIN [De-Store].[dbo].[Warehouse] W ON P.ID = W.ProductID";
 
             SqlCommand cmd = new(commandText, myDBManager.SQLConnection);
 
@@ -51,9 +51,9 @@ namespace De_Store.Server.Models
 
             while (myReader.Read())
             {
-                if (int.TryParse(myReader[0].ToString(), out int myID) && double.TryParse(myReader[3].ToString(), out double myCost))
+                if (int.TryParse(myReader[0].ToString(), out int myID) && double.TryParse(myReader[3].ToString(), out double myCost) && int.TryParse(myReader[5].ToString(), out int myStock))
                 {
-                    myCurrentStockPerItem.Add(new Product(myID, productType: myReader[1].ToString(), productDescription: myReader[2].ToString(), myCost, (bool)myReader[4]));
+                    myCurrentStockPerItem.Add(new Product(myID, productType: myReader[1].ToString(), productDescription: myReader[2].ToString(), myCost, (bool)myReader[4], myStock));
                 };
             }
 

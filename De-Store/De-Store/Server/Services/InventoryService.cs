@@ -46,7 +46,8 @@ namespace De_Store.Shared.Services
                     ProductType = p.ProductType,
                     ProductDescription = p.ProductDescription,
                     ProductCost = p.ProductCost,
-                    AvailableToBuy = p.AvailableToBuy
+                    AvailableToBuy = p.AvailableToBuy,
+                    ProductStock = p.Stock
                 };
 
                 await response.WriteAsync(myReply);
