@@ -1,4 +1,5 @@
 using De_Store.Client;
+using De_Store.Service.Inventory.Protos;
 using De_Store.Service.Products.Protos;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
@@ -18,9 +19,16 @@ builder.Services.AddSingleton(services =>
     var baseUri = services.GetRequiredService<NavigationManager>().BaseUri;
     var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions { HttpClient = httpClient });
 
-    // Now we can instantiate gRPC clients for this channel  
     return new ProductManagementService.ProductManagementServiceClient(channel);
+});
 
+builder.Services.AddSingleton(services =>
+{
+    var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
+    var baseUri = services.GetRequiredService<NavigationManager>().BaseUri;
+    var channel = GrpcChannel.ForAddress("https://localhost:5002", new GrpcChannelOptions { HttpClient = httpClient });
+
+    return new InventoryManagementService.InventoryManagementServiceClient(channel);
 });
 
 await builder.Build().RunAsync();

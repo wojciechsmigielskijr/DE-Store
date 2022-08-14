@@ -1,0 +1,50 @@
+﻿@page "/InventoryControl"
+@using De_Store.Service.Inventory.Protos
+@using De_Store.Shared.Models
+@using Google.Protobuf.WellKnownTypes
+@using Grpc.Core
+@inject InventoryManagementService.InventoryManagementServiceClient invManager
+
+<PageTitle>Inventory Management</PageTitle>
+
+<h1>Inventory Management</h1>
+
+
+@if (locations.Any())
+{
+    <select>
+        <option value="default" selected></option>
+    @foreach(var l in locations)
+    {
+        <option value="@l.ID">@l.LocationName</option>    
+    }
+    </select>
+}
+
+@code {
+    private List<Location> locations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var myLocations = invManager.GetLocations(new GetLocationsRequest());
+
+        while (await myLocations.ResponseStream.MoveNext())
+        {
+            locations.Add(new Location(myLocations.ResponseStream.Current.LocationID,
+                myLocations.ResponseStream.Current.LocationName)
+            );
+        }
+    }
+
+    public class Location
+    {
+        public Location(int id, string locationName)
+        {
+            ID = id;
+            LocationName = locationName;
+        }
+
+        public int ID { get; set; }
+        public string LocationName { get; set; }
+    }
+}

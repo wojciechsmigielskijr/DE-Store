@@ -75,7 +75,6 @@ namespace De_Store.Service.Products.Services
             }
 
             return;
-
         }
 
         public override async Task<UpdatePriceReply> UpdatePrice(UpdatePriceRequest request, ServerCallContext context)

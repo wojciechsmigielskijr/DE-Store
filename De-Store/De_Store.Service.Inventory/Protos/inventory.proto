@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "De_Store.Service.Inventory.Protos";
+
+package inventory;
+
+service InventoryManagementService {
+  rpc GetLocations (GetLocationsRequest) returns (stream GetLocationsResponse);
+  rpc GetInventory (GetInventoryRequest) returns (stream GetInventoryResponse);
+}
+
+message GetLocationsRequest {
+}
+
+message GetLocationsResponse {
+	int32 LocationID = 1;
+	string LocationName = 2;
+}
+
+message GetInventoryRequest {
+	int32 LocationID = 1;
+}
+
+message GetInventoryResponse {
+	int32 productID = 1;
+	string productType = 2;
+	string productDescription = 3;
+	double productCost = 4;
+	google.protobuf.Int32Value productStock = 5;
+}
