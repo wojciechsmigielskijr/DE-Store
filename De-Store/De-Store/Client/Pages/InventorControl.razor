@@ -1,9 +1,9 @@
 ﻿@page "/InventoryControl"
+@using De_Store.Service.Products.Protos
 @using De_Store.Shared.Models
-@using De_Store.Shared.Protos
 @using Google.Protobuf.WellKnownTypes
 @using Grpc.Core
-@inject InventoryManager.InventoryManagerClient invManager
+@inject ProductManagementService.ProductManagementServiceClient productManager
 
 <PageTitle>Price Control</PageTitle>
 
@@ -66,7 +66,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        using var myProducts = invManager.GetProducts(new GetProductsRequest());
+        using var myProducts = productManager.GetProducts(new GetProductsRequest());
 
         while (await myProducts.ResponseStream.MoveNext())
         {
@@ -82,14 +82,14 @@
 
     private async Task ToggleAvailableToBuy(Product p)
     {
-        await invManager.UpdateAvailableAsync(new UpdateAvailableRequest() { ProductID = p.ProductID, AvailableToBuy = NewCheckboxValue });
+        await productManager.UpdateAvailableAsync(new UpdateAvailableRequest() { ProductID = p.ProductID, AvailableToBuy = NewCheckboxValue });
     }
 
     private async Task ChangePrice(Product p)
     {
         if(NewCost != p.ProductCost)
         {
-           await invManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost });
+           await productManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost });
         }
     }
 

@@ -1,0 +1,74 @@
+﻿syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+
+option csharp_namespace = "De_Store.Service.Products.Protos";
+
+package products;
+
+service ProductManagementService {
+  rpc CheckStock (CheckStockRequest) returns (stream CheckStockReply);
+  rpc GetProducts (GetProductsRequest) returns (stream GetProductsReply);
+  rpc GetOffers (GetOffersRequest) returns (stream GetOffersReply);
+  rpc UpdatePrice (UpdatePriceRequest) returns (UpdatePriceReply);
+  rpc UpdateOffer (UpdateOfferRequest) returns (UpdateOfferReply);
+  rpc UpdateAvailable (UpdateAvailableRequest) returns (UpdateAvailableReply);
+}
+
+//Get Stock
+message CheckStockRequest {
+}
+
+message CheckStockReply {
+	int32 stockAmount = 1;
+	int32 productItemID = 2;
+}
+
+//Get Products
+message GetProductsRequest {
+
+}
+
+message GetProductsReply {
+	int32 productID = 1;
+	string productType = 2;
+	string productDescription = 3;
+	double productCost = 4;
+	bool availableToBuy = 5;
+	google.protobuf.Int32Value productStock = 6;
+	google.protobuf.Int32Value offerID = 7;
+}
+
+message GetOffersRequest {
+
+}
+
+message GetOffersReply {
+	int32 offerID = 1;
+	string offerName = 2;
+	string offerDescription = 3;
+}
+
+message UpdatePriceRequest {
+	int32 productID = 1;
+	double productCost = 2;
+}
+
+message UpdatePriceReply {
+}
+
+message UpdateOfferRequest {
+	int32 productID = 1;
+	google.protobuf.Int32Value offerID = 2;
+}
+
+message UpdateOfferReply {
+}
+
+message UpdateAvailableRequest {
+	int32 productID = 1;
+	bool availableToBuy = 2;
+}
+
+message UpdateAvailableReply {
+}

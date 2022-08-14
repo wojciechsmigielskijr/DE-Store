@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "De_Store.Shared", "De-Store
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "De_Store.Database", "De-Store\Database\De_Store.Database.sqlproj", "{39FE0843-640D-4B0E-927B-DD61CE306E4A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "De_Store.Service.Products", "De_Store.Service.Products\De_Store.Service.Products.csproj", "{AE616ABC-81A0-4BC2-9784-E632CCDA7FD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{39FE0843-640D-4B0E-927B-DD61CE306E4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39FE0843-640D-4B0E-927B-DD61CE306E4A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{39FE0843-640D-4B0E-927B-DD61CE306E4A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{AE616ABC-81A0-4BC2-9784-E632CCDA7FD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE616ABC-81A0-4BC2-9784-E632CCDA7FD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE616ABC-81A0-4BC2-9784-E632CCDA7FD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE616ABC-81A0-4BC2-9784-E632CCDA7FD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

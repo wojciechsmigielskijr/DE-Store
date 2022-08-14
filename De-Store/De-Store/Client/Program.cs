@@ -1,5 +1,5 @@
 using De_Store.Client;
-using De_Store.Shared.Protos;
+using De_Store.Service.Products.Protos;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using Microsoft.AspNetCore.Components;
@@ -19,7 +19,7 @@ builder.Services.AddSingleton(services =>
     var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions { HttpClient = httpClient });
 
     // Now we can instantiate gRPC clients for this channel  
-    return new InventoryManager.InventoryManagerClient(channel);
+    return new ProductManagementService.ProductManagementServiceClient(channel);
 
 });
 

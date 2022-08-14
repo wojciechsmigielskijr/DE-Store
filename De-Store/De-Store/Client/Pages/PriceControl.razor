@@ -1,21 +1,12 @@
 ﻿@page "/PriceControl"
-@using De_Store.Shared.Models
-@using De_Store.Shared.Protos
+@using De_Store.Service.Products.Protos
 @using Google.Protobuf.WellKnownTypes
 @using Grpc.Core
-@inject InventoryManager.InventoryManagerClient invManager
+@inject ProductManagementService.ProductManagementServiceClient productManager
 
 <PageTitle>Price Control</PageTitle>
 
 <h1>Price Control</h1>
-<button @onclick="GetMyProducts">Refresh Items</button>
-
-@if (showEditDialog)
-{
-    <form>
-
-    </form>
-}
 
 @if (products.Any())
 {
@@ -26,8 +17,7 @@
                 <th>Product Description</th>
                 <th>Product Cost</th>
                 <th>Allow Users to buy</th>
-                <th>Stock</th>
-                <th>Actions</th>
+                <th>Offer</th>
             </tr>
         </thead>
         <tbody>
@@ -39,8 +29,23 @@
                     <td>@p.ProductDescription</td>
                     <td><input value="@p.ProductCost" @onchange="(e) => { RowChangedID = p.ProductID; NewCost = Convert.ToDouble(e.Value); ChangePrice(p); }"></td>
                     <td><input type="checkbox" @key="@p.ProductID" checked="@p.AvailableToBuy" @onchange="(e) => { NewCheckboxValue = Convert.ToBoolean(e.Value); ToggleAvailableToBuy(p); }"/></td>
-                    <td>@p.Stock</td>
-                    <td><button onclick="">Save</button></td>
+                    <td>
+                        <select @onchange="(e) => { NewOfferID = Convert.ToInt16(e.Value); ChangeOffer(p); }">
+                            @foreach(var o in offers)
+                            {
+                                @if(o.OfferID == p.OfferID)
+                                {
+                                    <option value="@o.OfferID" selected>@o.OfferName</option>
+                                }
+                                else
+                                {
+                                    <option value="@o.OfferID">@o.OfferName</option>
+                                }
+
+                            }
+                        </select>
+                        
+                    </td>
                 </tr>
             }
         </tbody>
@@ -49,21 +54,35 @@
 
 @code {
     private List<Product> products = new();
-    private bool showEditDialog = false;
+    private List<Offers> offers = new();
     private bool NewCheckboxValue = false;
     private int? RowChangedID = null;
+    private int? NewOfferID = null;
     private double NewCost;
 
     protected override async Task OnInitializedAsync()
     {
         await GetMyProducts();
+        await GetOffers();
+
+        var timer = new System.Threading.Timer((_) =>
+        {
+            InvokeAsync( async ()  =>
+            {
+               // Add your update logic here
+               // Update the UI
+               await GetMyProducts();
+               await GetOffers();
+               StateHasChanged();
+            });
+        }, null, 0, 1000);
     }
 
     private async Task GetMyProducts()
     {
         products.Clear();
 
-        using var myProducts = invManager.GetProducts(new GetProductsRequest());
+        using var myProducts = productManager.GetProducts(new GetProductsRequest());
 
         while (await myProducts.ResponseStream.MoveNext())
         {
@@ -73,20 +92,73 @@
                 myProducts.ResponseStream.Current.ProductDescription,
                 myProducts.ResponseStream.Current.ProductCost,
                 myProducts.ResponseStream.Current.AvailableToBuy,
-                myProducts.ResponseStream.Current.ProductStock
+                myProducts.ResponseStream.Current.OfferID
+            ));
+        }
+    }
+    private async Task GetOffers()
+    {
+        offers.Clear();
+
+        using var myOffers = productManager.GetOffers(new GetOffersRequest());
+
+        while (await myOffers.ResponseStream.MoveNext())
+        {
+            offers.Add(
+                new Offers(myOffers.ResponseStream.Current.OfferID,
+                myOffers.ResponseStream.Current.OfferName,
+                myOffers.ResponseStream.Current.OfferDescription
             ));
         }
     }
 
     private async Task ToggleAvailableToBuy(Product p)
     {
-        await invManager.UpdateAvailableAsync(new UpdateAvailableRequest() { ProductID = p.ProductID, AvailableToBuy = NewCheckboxValue });
+        await productManager.UpdateAvailableAsync(new UpdateAvailableRequest() { ProductID = p.ProductID, AvailableToBuy = NewCheckboxValue });
     }
 
     private async Task ChangePrice(Product p)
     {
-        if(NewCost != p.ProductCost)
-        { await invManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost }); }
+        if (NewCost != p.ProductCost)
+        { await productManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost }); }
+    }
+
+    private async Task ChangeOffer(Product p)
+    {
+        await productManager.UpdateOfferAsync(new UpdateOfferRequest() { ProductID = p.ProductID, OfferID = NewOfferID });
+    }
+
+    public class Product
+    {
+        public Product(int productID, string productType, string productDescription, double productCost, bool availableToBuy, int? offerID = null)
+        {
+            ProductID = productID;
+            ProductType = productType;
+            ProductDescription = productDescription;
+            ProductCost = productCost;
+            AvailableToBuy = availableToBuy;
+            OfferID = offerID;
+        }
+        public int ProductID { get; set; }
+        public string ProductType { get; set; }
+        public string ProductDescription { get; set; }
+        public double ProductCost { get; set; }
+        public bool AvailableToBuy { get; set; }
+        public int? OfferID { get; set; }
+    }
+
+    public class Offers
+    {
+        public Offers(int offerID, string offerName, string offerDescription)
+        {
+            OfferID = offerID;
+            OfferName = offerName;
+            OfferDescription = offerDescription;
+        }
+
+        public int OfferID { get; set; }
+        public string OfferName { get; set; }
+        public string OfferDescription { get; set; }    
     }
 
 }
