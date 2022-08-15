@@ -3,10 +3,10 @@ using Grpc.Core;
 
 namespace De_Store.Service.LoyaltyCards.Services
 {
-    public class GreeterService : Greeter.GreeterBase
+    public class LoyaltyCardsService : Greeter.GreeterBase
     {
-        private readonly ILogger<GreeterService> _logger;
-        public GreeterService(ILogger<GreeterService> logger)
+        private readonly ILogger<LoyaltyCardsService> _logger;
+        public LoyaltyCardsService(ILogger<LoyaltyCardsService> logger)
         {
             _logger = logger;
         }
