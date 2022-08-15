@@ -69,8 +69,6 @@
         {
             InvokeAsync( async ()  =>
             {
-               // Add your update logic here
-               // Update the UI
                await GetMyProducts();
                await GetOffers();
                StateHasChanged();
@@ -96,6 +94,7 @@
             ));
         }
     }
+
     private async Task GetOffers()
     {
         offers.Clear();

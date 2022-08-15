@@ -12,17 +12,106 @@
 
 @if (locations.Any())
 {
-    <select>
-        <option value="default" selected></option>
-    @foreach(var l in locations)
-    {
-        <option value="@l.ID">@l.LocationName</option>    
-    }
+    <select @onchange="(e) => { var myValue = e.Value.ToString(); ChangeLocation(myValue); }">
+        <option value="default" selected>Please Select a value</option>
+        @foreach(var l in locations)
+        {
+            <option value="@l.ID">@l.LocationName</option>    
+        }
     </select>
+}
+
+@if (inventoryItems.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Type</th>
+                <th>Product Description</th>
+                <th>Product Cost</th>
+                <th>Stock</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in inventoryItems)
+            {
+                <tr @key="@i">
+                    <td id="ProductID" value="@i.ProductID" hidden></td>
+                    <td>@i.ProductType</td>
+                    <td>@i.ProductDescription</td>
+                    <td>@i.ProductCost</td>
+                    <td>@i.Stock</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<h2>Stock Warnings</h2>
+<h3>New Stock Warnings</h3>
+@if (newLowStockItems.Any())
+{
+       <table class="table">
+        <thead>
+            <tr>
+                <th>Product Type</th>
+                <th>Product Description</th>
+                <th>Stock</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in newLowStockItems)
+            {
+                <tr @key="@i" style="@StyleRows(i.Stock)">
+                    <td id="ProductID" value="@i.ProductID" hidden></td>
+                    <td>@i.ProductType</td>
+                    <td>@i.ProductDescription</td>
+                    <td>@i.Stock</td>
+                    <td>@i.LocationName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div>No New Stock warnings</div>
+}
+
+<h3>Existing Stock Warnings</h3>
+@if (lowStockItems.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Type</th>
+                <th>Product Description</th>
+                <th>Stock</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in lowStockItems)
+            {
+                <tr @key="@i" style="@StyleRows(i.Stock)">
+                    <td id="ProductID" value="@i.ProductID" hidden></td>
+                    <td>@i.ProductType</td>
+                    <td>@i.ProductDescription</td>
+                    <td>@i.Stock</td>
+                    <td>@i.LocationName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
 
 @code {
     private List<Location> locations = new();
+    private List<InventoryItemDetailed> inventoryItems = new();
+    private List<LowStockItem> lowStockItems = new();
+    private List<LowStockItem> newLowStockItems = new();
+    private int? NewLocationID = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,6 +123,87 @@
                 myLocations.ResponseStream.Current.LocationName)
             );
         }
+
+        using var myLowStock = invManager.GetLowStock(new GetLowStockRequest());       
+        while (await myLowStock.ResponseStream.MoveNext())
+        {
+            lowStockItems.Add(new LowStockItem(myLowStock.ResponseStream.Current.WarehouseID,
+                myLowStock.ResponseStream.Current.ProductType,
+                myLowStock.ResponseStream.Current.ProductDescription,
+                myLowStock.ResponseStream.Current.Location,
+                myLowStock.ResponseStream.Current.ProductStock
+            ));
+        }
+
+        var timer = new System.Threading.Timer((_) =>
+        {
+            InvokeAsync( async ()  =>
+            {
+                await GetNewStockAlerts();
+                StateHasChanged();
+            });
+        }, null, 0, 1000);
+    }
+
+    private async Task GetNewStockAlerts()
+    {
+        newLowStockItems.Clear();
+
+        using var myNewLowStock = invManager.GetLowStock(new GetLowStockRequest());       
+        while (await myNewLowStock.ResponseStream.MoveNext())
+        {
+            LowStockItem lowStockItem = new LowStockItem(myNewLowStock.ResponseStream.Current.WarehouseID,
+                myNewLowStock.ResponseStream.Current.ProductType,
+                myNewLowStock.ResponseStream.Current.ProductDescription,
+                myNewLowStock.ResponseStream.Current.Location,
+                myNewLowStock.ResponseStream.Current.ProductStock
+            );        
+
+            if(!lowStockItems.Any(c => c.WarehouseID == lowStockItem.WarehouseID)){
+                newLowStockItems.Add(lowStockItem);
+            }
+        }       
+    }
+
+    private async Task ChangeLocation(string value)
+    {
+        Console.WriteLine(value);
+
+        if (value == "default")
+        {
+            inventoryItems.Clear();
+        }
+        else
+        {
+            inventoryItems.Clear();
+            int myLocationID =  Convert.ToInt32(value);
+            using var myInventory = invManager.GetInventory(new GetInventoryRequest() { LocationID = myLocationID });
+            while (await myInventory.ResponseStream.MoveNext())
+            {
+                inventoryItems.Add(
+                        new InventoryItemDetailed(myInventory.ResponseStream.Current.ProductID,
+                        myInventory.ResponseStream.Current.ProductType,
+                        myInventory.ResponseStream.Current.ProductDescription,
+                        myInventory.ResponseStream.Current.ProductCost,
+                        myInventory.ResponseStream.Current.ProductStock
+                    ));
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    private string StyleRows(int? inStock)
+    {
+        string myResult = inStock switch
+        {
+            0 => "background-color: lightpink", 
+            > 0 and <= 3 => "background-color: #faae61",
+            > 3 and <= 10 => "background-color: lightgoldenrodyellow",
+            _ => "background-color: white"
+        };
+
+        return myResult;
     }
 
     public class Location
@@ -45,6 +215,41 @@
         }
 
         public int ID { get; set; }
+        public string LocationName { get; set; }
+    }
+
+    public class InventoryItem
+    {
+        public int ProductID { get; set; }
+        public string ProductType { get; set; }
+        public string ProductDescription { get; set; }
+        public double ProductCost { get; set; }
+        public int? Stock { get; set; }
+    }
+
+    public class InventoryItemDetailed : InventoryItem
+    {
+        public InventoryItemDetailed(int productID, string productType, string productDescription, double productCost, int? stock = null)
+        {
+            ProductID = productID;
+            ProductType = productType;
+            ProductDescription = productDescription;
+            ProductCost = productCost;
+            Stock = stock;
+        }
+    }
+
+    public class LowStockItem : InventoryItem
+    {
+        public LowStockItem(int warehouseID, string productType, string productDescription, string location, int? stock = null)
+        {
+            WarehouseID = warehouseID;
+            ProductType = productType;
+            ProductDescription = productDescription;
+            LocationName = location;
+            Stock = stock;
+        }
+        public int WarehouseID { get; set; }
         public string LocationName { get; set; }
     }
 }

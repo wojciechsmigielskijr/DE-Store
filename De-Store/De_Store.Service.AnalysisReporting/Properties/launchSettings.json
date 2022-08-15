@@ -1,0 +1,13 @@
+﻿{
+  "profiles": {
+    "De_Store.Service.AnalysisReporting": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5105;https://localhost:7105",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

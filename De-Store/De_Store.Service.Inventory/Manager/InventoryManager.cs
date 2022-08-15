@@ -10,7 +10,7 @@ namespace De_Store.Service.Inventory.Manager
         {
             DatabaseManager myDBManager = new();
 
-            string commandText = " SELECT P.ID, P.ProductType, P.ProductDescription, P.ProductCost, W.Stock FROM [De-Store].[dbo].[Warehouse] W LEFT JOIN [De-Store].[dbo].[Products] P ON W.ProductID = P.ID WHERE " + locationID;
+            string commandText = "SELECT P.ID, P.ProductType, P.ProductDescription, P.ProductCost, W.Stock FROM [De-Store].[dbo].[Warehouse] W LEFT JOIN [De-Store].[dbo].[Products] P ON W.ProductID = P.ID WHERE W.LocationID = " + locationID;
 
             SqlCommand cmd = new(commandText, myDBManager.SQLConnection);
 
@@ -61,6 +61,38 @@ namespace De_Store.Service.Inventory.Manager
             myDBManager.CleanUp();
 
             return myLocations;
+        }
+
+        public List<LowStockItem> GetLowStock()
+        {
+            DatabaseManager myDBManager = new();
+
+            string commandText = @"SELECT W.ID, P.ProductType, P.ProductDescription, W.Stock, L.Location
+                                    FROM[De-Store].[dbo].[Warehouse] W LEFT JOIN[De-Store].[dbo].[Products] P
+                                    ON W.ProductID = P.ID
+                                    INNER JOIN[De-Store].dbo.Locations L ON L.ID = W.LocationID
+                                    WHERE W.Stock <= 5";
+
+            SqlCommand cmd = new(commandText, myDBManager.SQLConnection);
+
+            myDBManager.SQLConnection.Open();
+
+            SqlDataReader myReader = cmd.ExecuteReader();
+
+            List<LowStockItem> myLowStockItems = new();
+
+            while (myReader.Read())
+            {
+                if (int.TryParse(myReader[0].ToString(), out int myID) && int.TryParse(myReader[3].ToString(), out int myStock))
+                {
+                    myLowStockItems.Add(new LowStockItem(myID, myReader[1].ToString(), myReader[2].ToString(), myReader[4].ToString(), myStock));
+                };
+            }
+            myReader.Close();
+
+            myDBManager.CleanUp();
+
+            return myLowStockItems;
         }
 
 

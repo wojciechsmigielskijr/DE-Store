@@ -16,7 +16,6 @@ namespace De_Store.Service.Inventory.Database
         {
             DatabaseConnectionString = "Data Source=WOJCIECHSDESK\\WOJCIECHSDESK;Initial Catalog=De-Store;Integrated Security=True";
             SQLConnection = new SqlConnection(DatabaseConnectionString);
-            //Call Db connection to get stock amount
         }
 
         public void CleanUp()

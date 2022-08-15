@@ -13,7 +13,15 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "De_Store.Database", "De-Sto
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "De_Store.Service.Products", "De_Store.Service.Products\De_Store.Service.Products.csproj", "{AE616ABC-81A0-4BC2-9784-E632CCDA7FD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "De_Store.Service.Inventory", "De_Store.Service.Inventory\De_Store.Service.Inventory.csproj", "{4D7C9AF3-9276-4279-AAAD-58EBD5B22B47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "De_Store.Service.Inventory", "De_Store.Service.Inventory\De_Store.Service.Inventory.csproj", "{4D7C9AF3-9276-4279-AAAD-58EBD5B22B47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "De_Store.Service.LoyaltyCards", "De_Store.Service.LoyaltyCards\De_Store.Service.LoyaltyCards.csproj", "{2F3DFEA9-5A5E-4AE1-8EB4-80C69348386A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "De_Store.Service.Finance", "De_Store.Service.Finance\De_Store.Service.Finance.csproj", "{BE3D8731-98DF-4223-99BE-CE8B15E3CC94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "De_Store.Service.AnalysisReporting", "De_Store.Service.AnalysisReporting\De_Store.Service.AnalysisReporting.csproj", "{E1D84A54-D644-49A3-938A-86916F2EE965}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "De_Store.Service.Configuration", "De_Store.Service.Configuration\De_Store.Service.Configuration.csproj", "{106BE5DB-DBB2-459D-8572-7AD27060B094}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +55,22 @@ Global
 		{4D7C9AF3-9276-4279-AAAD-58EBD5B22B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D7C9AF3-9276-4279-AAAD-58EBD5B22B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D7C9AF3-9276-4279-AAAD-58EBD5B22B47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F3DFEA9-5A5E-4AE1-8EB4-80C69348386A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F3DFEA9-5A5E-4AE1-8EB4-80C69348386A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F3DFEA9-5A5E-4AE1-8EB4-80C69348386A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F3DFEA9-5A5E-4AE1-8EB4-80C69348386A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE3D8731-98DF-4223-99BE-CE8B15E3CC94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE3D8731-98DF-4223-99BE-CE8B15E3CC94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE3D8731-98DF-4223-99BE-CE8B15E3CC94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE3D8731-98DF-4223-99BE-CE8B15E3CC94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1D84A54-D644-49A3-938A-86916F2EE965}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1D84A54-D644-49A3-938A-86916F2EE965}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1D84A54-D644-49A3-938A-86916F2EE965}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1D84A54-D644-49A3-938A-86916F2EE965}.Release|Any CPU.Build.0 = Release|Any CPU
+		{106BE5DB-DBB2-459D-8572-7AD27060B094}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{106BE5DB-DBB2-459D-8572-7AD27060B094}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{106BE5DB-DBB2-459D-8572-7AD27060B094}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{106BE5DB-DBB2-459D-8572-7AD27060B094}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

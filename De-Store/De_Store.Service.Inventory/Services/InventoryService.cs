@@ -55,5 +55,28 @@ namespace De_Store.Service.Inventory.Services
 
             return;
         }
+
+        public override async Task GetLowStock(GetLowStockRequest request, IServerStreamWriter<GetLowStockResponse> response, ServerCallContext context)
+        {
+            InventoryManager myInventoryManager = new();
+
+            List<LowStockItem> myLowStockItems = myInventoryManager.GetLowStock();
+
+            foreach (LowStockItem i in myLowStockItems)
+            {
+                GetLowStockResponse myResponse = new()
+                {
+                    WarehouseID = i.WarehouseID,
+                    ProductType = i.ProductType,
+                    ProductDescription = i.ProductDescription,
+                    Location = i.LocationName,
+                    ProductStock = i.Stock
+                };
+
+                await response.WriteAsync(myResponse);
+            }
+
+            return;
+        }
     }
 }
