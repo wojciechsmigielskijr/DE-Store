@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-option csharp_namespace = "De_Store.Service.LoyaltyCards";
+option csharp_namespace = "De_Store.Service.LoyaltyCards.Protos";
 
 package loyalty;
 
 import "google/protobuf/wrappers.proto";
 
-service LoyaltyCards {
+service LoyaltyCardsCustomerService {
   rpc GetOffersForLoyaltyCard (GetOffersForLoyaltyCardsRequest) returns (stream GetOffersForLoyaltyCardsReply);
   rpc SetOfferForLoyaltyCard (SetOffersForLoyaltyCardsRequest) returns (SetOffersForLoyaltyCardsReply);
   rpc GetLoyaltyCards (GetLoyaltyCardsRequest) returns (stream GetLoyaltyCardsReply);
@@ -57,6 +57,7 @@ message CustomersReply {
 	google.protobuf.Int32Value loyaltyPoints = 6;
 	google.protobuf.Int32Value loyaltyCardRevoked = 7;
 	google.protobuf.Int32Value loyaltyCardTypeID = 8; 
+	string loyaltyCardDescription = 9;
 }
 
 message AssignCustomerLoyaltyCardRequest {

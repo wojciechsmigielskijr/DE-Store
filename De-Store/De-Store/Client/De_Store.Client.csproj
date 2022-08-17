@@ -33,6 +33,9 @@
     <Protobuf Include="..\..\De_Store.Service.Inventory\Protos\inventory.proto" GrpcServices="Client">
       <Link>Protos\inventory.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\..\De_Store.Service.LoyaltyCards\Protos\loyalty.proto" GrpcServices="Client">
+      <Link>Protos\loyalty.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\..\De_Store.Service.Products\Protos\products.proto" GrpcServices="Client">
       <Link>Protos\products.proto</Link>
     </Protobuf>

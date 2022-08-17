@@ -2,6 +2,7 @@ using De_Store.Client;
 using De_Store.Service.Inventory.Protos;
 using De_Store.Service.Products.Protos;
 using De_Store.Service.AnalysisReporting.Protos;
+using De_Store.Service.LoyaltyCards.Protos;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using Microsoft.AspNetCore.Components;
@@ -39,6 +40,15 @@ builder.Services.AddSingleton(services =>
     var channel = GrpcChannel.ForAddress("https://localhost:5005", new GrpcChannelOptions { HttpClient = httpClient });
 
     return new AnalysisReporter.AnalysisReporterClient(channel);
+});
+
+builder.Services.AddSingleton(services =>
+{
+    var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler()));
+    var baseUri = services.GetRequiredService<NavigationManager>().BaseUri;
+    var channel = GrpcChannel.ForAddress("https://localhost:5003", new GrpcChannelOptions { HttpClient = httpClient });
+
+    return new LoyaltyCardsCustomerService.LoyaltyCardsCustomerServiceClient(channel);
 });
 
 await builder.Build().RunAsync();

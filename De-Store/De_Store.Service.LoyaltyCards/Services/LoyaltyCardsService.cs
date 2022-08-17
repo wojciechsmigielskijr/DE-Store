@@ -1,11 +1,12 @@
 using De_Store.Service.LoyaltyCards;
 using De_Store.Service.LoyaltyCards.Manager;
 using De_Store.Service.LoyaltyCards.Models;
+using De_Store.Service.LoyaltyCards.Protos;
 using Grpc.Core;
 
 namespace De_Store.Service.LoyaltyCards.Services
 {
-    public class LoyaltyCardsService : LoyaltyCards.LoyaltyCardsBase
+    public class LoyaltyCardsService : LoyaltyCardsCustomerService.LoyaltyCardsCustomerServiceBase
     {
         private readonly ILogger<LoyaltyCardsService> _logger;
         public LoyaltyCardsService(ILogger<LoyaltyCardsService> logger)
@@ -46,11 +47,14 @@ namespace De_Store.Service.LoyaltyCards.Services
                     LoyaltyCardID = c.CustomerLoyaltyCardID,
                     LoyaltyCardTypeID = c.CustomerLoyaltyCardTypeID,
                     LoyaltyCardRevoked = c.CustomerLoyaltyCardRevoked,
-                    LoyaltyPoints = c.CustomerLoyaltyCardPoints
+                    LoyaltyPoints = c.CustomerLoyaltyCardPoints, 
+                    LoyaltyCardDescription = c.LoyaltyCardTypeDescription
                 };
 
                 await response.WriteAsync(myReply);
             }
+
+            return;
         }
 
         public override async Task<AssignCustomerLoyaltyCardReply> GiveCustomerLoyaltyCard(AssignCustomerLoyaltyCardRequest request, ServerCallContext context)

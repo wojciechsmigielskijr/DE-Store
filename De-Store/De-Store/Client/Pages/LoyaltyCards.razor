@@ -1,27 +1,122 @@
 ﻿@page "/LoyaltyCards"
+@using De_Store.Service.LoyaltyCards.Protos
+@using Google.Protobuf.WellKnownTypes
+@using Grpc.Core
+@inject LoyaltyCardsCustomerService.LoyaltyCardsCustomerServiceClient loyaltyManager
 
 <PageTitle>Loyalty Cards</PageTitle>
 
 <h1>Loyalty Cards</h1>
 
+
+
 <h2>Configure Offers for Loyalty Cards</h2>
+<!--
+This will contain each loyalty card with in a table row and users will be able to add a new tag for the lyoalty card
+-->
+
+<h2>Add Offers</h2>
+<!--
+Users will be able to add a offer and Cost 
+-->
+
+<h2>Customers</h2>
 
 
-
-<h2>Customers with Loyalty Cards</h2>
-
-<h2>Customers with revoked Loyalty Cards</h2>
-
-<h2>Customers without Loyalty Cards</h2>
-
+@if (customers.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Active</th>
+                <th>Loyalty Card Type</th>
+                <th>Points</th>
+                <th>Loyalty Card Revoked</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in customers)
+            {
+                <tr @key="@c">
+                    <td id="CustomerID" value="@c.CustomerID" hidden></td>
+                    <td id="LoyaltyCardID" value="@c.CustomerLoyaltyCardID" hidden></td>
+                    <td id="LoyaltyCardTypeID" value="@c.CustomerLoyaltyCardTypeID" hidden></td>
+                    <td>@c.CustomerName</td>
+                    <td>@c.CustomerAddress</td>
+                    <td>@c.CustomerActive</td>
+                    <td>@c.LoyaltyCardTypeDescription</td>
+                    <td>@c.CustomerLoyaltyCardPoints</td>
+                    <td>@if (c.CustomerLoyaltyCardID != null) { <input type="checkbox" @key="c.IsRevoked" checked="@c.IsRevoked"/> } </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 
 
 @code {
-    private int currentCount = 0;
+    private List<Customer> customers = new();
 
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        await GetMyCustomers();
+    }
+
+    private async Task GetMyCustomers()
+    {
+        customers.Clear();
+
+        using var myCustomers = loyaltyManager.GetCustomers(new CustomersRequest());
+
+        while (await myCustomers.ResponseStream.MoveNext())
+        {
+            customers.Add(
+                new Customer(myCustomers.ResponseStream.Current.CustomerID,
+                myCustomers.ResponseStream.Current.Name,
+                myCustomers.ResponseStream.Current.Address,
+                myCustomers.ResponseStream.Current.Active,
+                myCustomers.ResponseStream.Current.LoyaltyCardID,
+                myCustomers.ResponseStream.Current.LoyaltyPoints,
+                myCustomers.ResponseStream.Current.LoyaltyCardRevoked,
+                myCustomers.ResponseStream.Current.LoyaltyCardTypeID,
+                myCustomers.ResponseStream.Current.LoyaltyCardDescription )           
+                );
+        }
+    }
+
+    public class Customer
+    {
+        public Customer(int customerID, string customerName, string customerAddress, bool customerActive, int? customerLoyaltyCardID, int? customerLoyaltyCardPoints, int? customerLoyaltyCardRevoked, int? customerLoyaltyCardTypeID, string loyaltyCardTypeDescription)
+        {
+            CustomerID = customerID;
+            CustomerName = customerName;
+            CustomerAddress = customerAddress;
+            CustomerActive = customerActive;
+            CustomerLoyaltyCardID = customerLoyaltyCardID;
+            CustomerLoyaltyCardPoints = customerLoyaltyCardPoints;
+            CustomerLoyaltyCardRevoked = customerLoyaltyCardRevoked;
+            CustomerLoyaltyCardTypeID = customerLoyaltyCardTypeID;
+            LoyaltyCardTypeDescription = loyaltyCardTypeDescription;
+
+            if (CustomerLoyaltyCardRevoked == 1)
+            { IsRevoked = true; }
+            else
+            { IsRevoked = false; }
+        }
+
+        public int CustomerID { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerAddress { get; set; }
+        public bool CustomerActive { get; set; }
+        public int? CustomerLoyaltyCardID { get; set; }
+        public int? CustomerLoyaltyCardPoints { get; set; }
+        public int? CustomerLoyaltyCardRevoked { get; set; }
+        public int? CustomerLoyaltyCardTypeID { get; set; }
+        public string LoyaltyCardTypeDescription { get; set; }
+        public bool IsRevoked { get; set; }
+
     }
 }
