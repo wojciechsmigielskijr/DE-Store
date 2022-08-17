@@ -5,7 +5,9 @@
 
 @inject AnalysisReporter.AnalysisReporterClient analysisReportingManager;
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>Analysis And Reporting</PageTitle>
+
+
 <div class="chartsContainer">
 <ApexChart @ref=SaleProductChart TItem="SaleProduct" Title="Sales By Product" Height="400" Width="500">   
 
@@ -16,17 +18,43 @@
                     XValue="@(e => e.ProductType)"
                     YValue="@(e => e.ProductSales)"
                     OrderByDescending="e=>e.Y" />
-                     </ApexChart>
+</ApexChart>
+
+<ApexChart @ref=SaleLocationChart TItem="SaleLocation" Title="Sales By Location" Height="400" Width="500">   
+
+    <ApexPointSeries TItem="SaleLocation"
+                    Items="saleLocations"
+                    SeriesType="SeriesType.Bar"
+                    Name="Total Sales"
+                    XValue="@(e => e.LocationName)"
+                    YValue="@(e => e.SaleAmount)"
+                    />
+</ApexChart>
+
+<ApexChart @ref=SaleMonthChart TItem="SaleMonth" Title="Sales By Month" Height="400" Width="500">   
+
+    <ApexPointSeries TItem="SaleMonth"
+                    Items="saleMonth"
+                    SeriesType="SeriesType.Bar"
+                    Name="Gross Value"
+                    XValue="@(e => e.YearMonth)"
+                    YValue="@(e => (decimal)e.SaleCost)"
+                     />
+</ApexChart>
 </div>
 
 @code {
     private ApexChart<SaleProduct> SaleProductChart;
     private List<SaleProduct> saleProducts = new();
 
+    private ApexChart<SaleLocation> SaleLocationChart;
+    private List<SaleLocation> saleLocations = new();
+
+    private ApexChart<SaleMonth> SaleMonthChart;
+    private List<SaleMonth> saleMonth = new();
 
     protected override async Task OnInitializedAsync()
     {
-
         using var myProductSales = analysisReportingManager.GetSaleDataByProduct(new SaleDataByProductRequest());
 
         while (await myProductSales.ResponseStream.MoveNext())
@@ -36,9 +64,59 @@
             );
         }
 
-        await SaleProductChart.RenderAsync();
+ 
+
+        using var myProductLocations = analysisReportingManager.GetSalesByLocation(new SalesByLocationRequest());
+
+        while (await myProductLocations.ResponseStream.MoveNext())
+        {
+            saleLocations.Add(new SaleLocation(myProductLocations.ResponseStream.Current.LocationSold,
+                myProductLocations.ResponseStream.Current.TotalsSales)
+            );
+
+ 
+        }
+
+       
+        using var mySaleMonth = analysisReportingManager.RevenueByMonth(new RevenueByMonthRequest());
+
+        while (await mySaleMonth.ResponseStream.MoveNext())
+        {
+            saleMonth.Add(new SaleMonth(mySaleMonth.ResponseStream.Current.MonthYear,
+                mySaleMonth.ResponseStream.Current.TotalSale)
+            );
+
+
+        }
+
+        SaleProductChart.RenderAsync();
+        SaleLocationChart.RenderAsync();
+        SaleMonthChart.RenderAsync();
     }
 
+    public class SaleLocation
+    {
+        public SaleLocation(string locationName, int saleAmount)
+        {
+            LocationName = locationName;
+            SaleAmount = saleAmount;
+        }
+
+        public string LocationName { get; set; }
+        public int SaleAmount { get; set; }
+    }
+
+    public class SaleMonth
+    {
+        public SaleMonth(string yearMonth, double saleCost)
+        {
+            YearMonth = yearMonth;
+            SaleCost = saleCost;
+        }
+
+        public string YearMonth { get; set; }
+        public double SaleCost { get; set; }
+    }
 
     public class SaleProduct
     {

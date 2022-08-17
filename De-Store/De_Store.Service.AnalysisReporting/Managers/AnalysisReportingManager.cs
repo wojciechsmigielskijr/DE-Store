@@ -32,8 +32,6 @@ namespace De_Store.Service.AnalysisReporting.Managers
 
             myDBManager.CleanUp();
 
-            mySaleLocations.OrderBy(i => i.SaleAmount);
-
             return mySaleLocations;
         }
 

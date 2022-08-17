@@ -1,0 +1,13 @@
+﻿body {
+}
+
+.stockAlert {
+    animation: blinker 1s linear 2;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+        background-color: lightsalmon;
+    }
+}

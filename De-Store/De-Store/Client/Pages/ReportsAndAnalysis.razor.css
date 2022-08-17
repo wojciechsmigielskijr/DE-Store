@@ -1,0 +1,8 @@
+﻿body {
+}
+
+.chartsContainer {
+    height: 60%;
+    display: flex;
+    justify-content: space-around;
+}

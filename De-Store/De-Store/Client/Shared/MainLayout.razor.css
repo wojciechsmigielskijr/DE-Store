@@ -33,20 +33,6 @@ main {
         }
 
 
-.stockAlert {
-    animation: blinker 1s linear 2;
-}
-
-.chartsContainer {
-    height: 60%;
-}
-
-@keyframes blinker {
-    50% {
-        opacity: 0;
-        background-color: lightsalmon;
-    }
-}
 
 
 @media (max-width: 640.98px) {
