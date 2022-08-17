@@ -37,6 +37,10 @@ main {
     animation: blinker 1s linear 2;
 }
 
+.chartsContainer {
+    height: 60%;
+}
+
 @keyframes blinker {
     50% {
         opacity: 0;

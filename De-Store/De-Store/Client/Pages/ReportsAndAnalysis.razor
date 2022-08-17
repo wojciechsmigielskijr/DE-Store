@@ -1,18 +1,54 @@
 ﻿@page "/ReportsAndAnalysis"
 
+@using De_Store.Service.AnalysisReporting.Protos
+@using Grpc.Core
+
+@inject AnalysisReporter.AnalysisReporterClient analysisReportingManager;
+
 <PageTitle>Counter</PageTitle>
+<div class="chartsContainer">
+<ApexChart @ref=SaleProductChart TItem="SaleProduct" Title="Sales By Product" Height="400" Width="500">   
 
-<h1>Counter</h1>
-
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    <ApexPointSeries TItem="SaleProduct"
+                    Items="saleProducts"
+                    SeriesType="SeriesType.Donut"
+                    Name="Gross Value"
+                    XValue="@(e => e.ProductType)"
+                    YValue="@(e => e.ProductSales)"
+                    OrderByDescending="e=>e.Y" />
+                     </ApexChart>
+</div>
 
 @code {
-    private int currentCount = 0;
+    private ApexChart<SaleProduct> SaleProductChart;
+    private List<SaleProduct> saleProducts = new();
 
-    private void IncrementCount()
+
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+
+        using var myProductSales = analysisReportingManager.GetSaleDataByProduct(new SaleDataByProductRequest());
+
+        while (await myProductSales.ResponseStream.MoveNext())
+        {
+            saleProducts.Add(new SaleProduct(myProductSales.ResponseStream.Current.ProductType,
+                myProductSales.ResponseStream.Current.ProductSales)
+            );
+        }
+
+        await SaleProductChart.RenderAsync();
+    }
+
+
+    public class SaleProduct
+    {
+        public SaleProduct(string productType, int productSales)
+        {
+            ProductType = productType;
+            ProductSales = productSales;
+        }
+
+        public string ProductType { get; set; }
+        public int ProductSales { get; set; }
     }
 }

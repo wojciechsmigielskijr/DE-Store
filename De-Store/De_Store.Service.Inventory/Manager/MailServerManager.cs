@@ -34,6 +34,18 @@ namespace De_Store.Service.Inventory.Manager
             SendMessage(message);
         }
 
+        public void SendNewOrderMessage(string myMessage)
+        {
+            MailMessage message = new("orders@de-store.com", "manager@de-store.com")
+            {
+                Subject = "NEW ORDER NOTIFICATION: Item went out of stock",
+                Body = myMessage,
+                IsBodyHtml = true
+            };
+
+            SendMessage(message);
+        }
+
         private SmtpClient? Client { get; set; }
 
 

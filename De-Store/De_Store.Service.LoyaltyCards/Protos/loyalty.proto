@@ -4,19 +4,72 @@ option csharp_namespace = "De_Store.Service.LoyaltyCards";
 
 package loyalty;
 
-// The greeting service definition.
+import "google/protobuf/wrappers.proto";
+
 service LoyaltyCards {
-  // Sends a greeting
-  rpc GetOffersForLoyaltyCard (HelloRequest) returns (HelloReply);
-  rpc SetOfferForLoyaltyCard (HelloRequest) returns (HelloReply);
+  rpc GetOffersForLoyaltyCard (GetOffersForLoyaltyCardsRequest) returns (stream GetOffersForLoyaltyCardsReply);
+  rpc SetOfferForLoyaltyCard (SetOffersForLoyaltyCardsRequest) returns (SetOffersForLoyaltyCardsReply);
+  rpc GetLoyaltyCards (GetLoyaltyCardsRequest) returns (stream GetLoyaltyCardsReply);
+  rpc GetCustomers (CustomersRequest) returns (stream CustomersReply);
+  rpc GiveCustomerLoyaltyCard (AssignCustomerLoyaltyCardRequest) returns (AssignCustomerLoyaltyCardReply);
+  rpc RevokeLoyaltyCard (RevokeLoyaltyCardRequest) returns (RevokeLoyaltyCardReply);
 }
 
-// The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+message GetOffersForLoyaltyCardsRequest { }
+
+message GetOffersForLoyaltyCardsReply {
+  int32 loyaltycardid = 1;
+  repeated LoyaltyOffer loyaltyCardOffer = 2;
 }
 
-// The response message containing the greetings.
-message HelloReply {
-  string message = 1;
+message LoyaltyOffer {
+  int32 loyaltycardofferid = 1;
+  string offertype = 2;
+  string offerdescription = 3;
+  int32 offercost = 4;
+}
+
+message SetOffersForLoyaltyCardsRequest { 
+	int32 loyaltycardid = 1;
+	int32 loyaltycardofferid = 2;
+}
+
+message SetOffersForLoyaltyCardsReply { }
+
+
+
+message GetLoyaltyCardsRequest { }
+
+message GetLoyaltyCardsReply { 
+	int32 loyaltycardid = 1;
+	string loyaltycardtype = 2;
+}
+
+
+message CustomersRequest { }
+
+message CustomersReply {
+	int32 customerID = 1;
+	string name = 2;
+	string address = 3; 
+	bool active = 4;
+	google.protobuf.Int32Value loyaltyCardID = 5; 
+	google.protobuf.Int32Value loyaltyPoints = 6;
+	google.protobuf.Int32Value loyaltyCardRevoked = 7;
+	google.protobuf.Int32Value loyaltyCardTypeID = 8; 
+}
+
+message AssignCustomerLoyaltyCardRequest {
+	int32 customerID = 1;
+	int32 loyaltyCardID = 2;
+}
+
+message AssignCustomerLoyaltyCardReply { }
+
+message RevokeLoyaltyCardRequest {
+	int32 customerID = 1;
+}
+
+message RevokeLoyaltyCardReply {
+
 }

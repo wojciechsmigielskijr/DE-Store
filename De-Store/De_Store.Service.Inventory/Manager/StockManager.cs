@@ -27,6 +27,7 @@ namespace De_Store.Service.Inventory.Manager
                 List<LowStockItem> newLowStock = new();
 
                 string myNewAlertMessge = null;
+                string myNewStockOrderedMessage = null;
 
                 newLowStock = inventoryManager.GetLowStock();
 
@@ -41,6 +42,14 @@ namespace De_Store.Service.Inventory.Manager
                                     <td>  {stockItem.Stock}  </td>     
                                     <td>  {stockItem.LocationName}  </td>     
                                     </tr>";
+
+                        if(stockItem.Stock == 0)
+                        {
+                            if (inventoryManager.OrderNewStock(stockItem.ProductTypeID, 50).Result == true)
+                            { myNewStockOrderedMessage = $"\n Stock Item was ordered {stockItem.ProductType} current order status is <b>Placed</b>"; }
+                            else
+                            { myNewStockOrderedMessage = $"\n Stock Item FAILED to be ordered {stockItem.ProductType}"; }
+                        }
                     }
                 }
 
@@ -52,8 +61,18 @@ namespace De_Store.Service.Inventory.Manager
 
                     myNewAlertMessge = null;
                 }
+
+                if (myNewStockOrderedMessage != null)
+                {
+                    myNewStockOrderedMessage = myNewStockOrderedMessage.Insert(0, "Hi, ");
+                    mailManager.SendNewOrderMessage(myNewStockOrderedMessage);
+
+                    myNewStockOrderedMessage = null;
+                }
             }
         }
+
+
 
     }
 }

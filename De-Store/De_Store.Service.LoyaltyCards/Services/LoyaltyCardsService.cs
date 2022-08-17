@@ -1,9 +1,11 @@
 using De_Store.Service.LoyaltyCards;
+using De_Store.Service.LoyaltyCards.Manager;
+using De_Store.Service.LoyaltyCards.Models;
 using Grpc.Core;
 
 namespace De_Store.Service.LoyaltyCards.Services
 {
-    public class LoyaltyCardsService : Greeter.GreeterBase
+    public class LoyaltyCardsService : LoyaltyCards.LoyaltyCardsBase
     {
         private readonly ILogger<LoyaltyCardsService> _logger;
         public LoyaltyCardsService(ILogger<LoyaltyCardsService> logger)
@@ -11,12 +13,54 @@ namespace De_Store.Service.LoyaltyCards.Services
             _logger = logger;
         }
 
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+        public override async Task GetOffersForLoyaltyCard(GetOffersForLoyaltyCardsRequest request, IServerStreamWriter<GetOffersForLoyaltyCardsReply> response, ServerCallContext context)
         {
-            return Task.FromResult(new HelloReply
+            return;
+        }
+
+        public override async Task<SetOffersForLoyaltyCardsReply> SetOfferForLoyaltyCard(SetOffersForLoyaltyCardsRequest request, ServerCallContext context)
+        {
+            return new SetOffersForLoyaltyCardsReply();
+        }
+
+        public override async Task GetLoyaltyCards(GetLoyaltyCardsRequest request, IServerStreamWriter<GetLoyaltyCardsReply> response, ServerCallContext context)
+        {
+            return;
+        }
+
+
+        public override async Task GetCustomers(CustomersRequest request, IServerStreamWriter<CustomersReply> response, ServerCallContext context)
+        {
+            LoyaltyCardManager myModel = new();
+
+            List<Customer> myCustomers = myModel.GetCustomers();
+
+            foreach (Customer c in myCustomers)
             {
-                Message = "Hello " + request.Name
-            });
+                CustomersReply myReply = new()
+                {
+                    CustomerID = c.CustomerID,
+                    Name = c.CustomerName,
+                    Address = c.CustomerAddress,
+                    Active = c.CustomerActive,
+                    LoyaltyCardID = c.CustomerLoyaltyCardID,
+                    LoyaltyCardTypeID = c.CustomerLoyaltyCardTypeID,
+                    LoyaltyCardRevoked = c.CustomerLoyaltyCardRevoked,
+                    LoyaltyPoints = c.CustomerLoyaltyCardPoints
+                };
+
+                await response.WriteAsync(myReply);
+            }
+        }
+
+        public override async Task<AssignCustomerLoyaltyCardReply> GiveCustomerLoyaltyCard(AssignCustomerLoyaltyCardRequest request, ServerCallContext context)
+        {
+            return new();
+        }
+
+        public override async Task<RevokeLoyaltyCardReply> RevokeLoyaltyCard(RevokeLoyaltyCardRequest request, ServerCallContext context)
+        {
+            return new();
         }
     }
 }

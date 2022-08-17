@@ -67,11 +67,11 @@ namespace De_Store.Service.Inventory.Manager
         {
             DatabaseManager myDBManager = new();
 
-            string commandText = @"SELECT W.ID, P.ProductType, P.ProductDescription, W.Stock, L.Location
+            string commandText = @"SELECT W.ID, P.ProductType, P.ProductDescription, W.Stock, L.Location, P.ID
                                     FROM[De-Store].[dbo].[Warehouse] W LEFT JOIN[De-Store].[dbo].[Products] P
                                     ON W.ProductID = P.ID
                                     INNER JOIN[De-Store].dbo.Locations L ON L.ID = W.LocationID
-                                    WHERE W.Stock <= 5";
+                                    WHERE W.Stock <= 10";
 
             SqlCommand cmd = new(commandText, myDBManager.SQLConnection);
 
@@ -83,9 +83,9 @@ namespace De_Store.Service.Inventory.Manager
 
             while (myReader.Read())
             {
-                if (int.TryParse(myReader[0].ToString(), out int myID) && int.TryParse(myReader[3].ToString(), out int myStock))
+                if (int.TryParse(myReader[0].ToString(), out int myID) && int.TryParse(myReader[3].ToString(), out int myStock) && int.TryParse(myReader[5].ToString(), out int myProductID))
                 {
-                    myLowStockItems.Add(new LowStockItem(myID, myReader[1].ToString(), myReader[2].ToString(), myReader[4].ToString(), myStock));
+                    myLowStockItems.Add(new LowStockItem(myID, myReader[1].ToString(), myReader[2].ToString(), myReader[4].ToString(), myStock) { ProductTypeID = myProductID });
                 };
             }
             myReader.Close();
@@ -95,6 +95,25 @@ namespace De_Store.Service.Inventory.Manager
             return myLowStockItems;
         }
 
+        public async Task<bool> OrderNewStock(int productID, int orderAmount)
+        {
+            DatabaseManager myDBManager = new();
+
+            string commandText = $"INSERT INTO [De-Store].[dbo].[HeaderQuartersOrders] (ProductTypeID, AmountOrdered, OrderState, OrderDate) VALUES ({productID}, {orderAmount}, 'Placed', {DateTime.Now})";
+
+            SqlCommand cmd = new(commandText, myDBManager.SQLConnection);
+
+            myDBManager.SQLConnection.Open();
+
+            int myOrder = await cmd.ExecuteNonQueryAsync();
+
+            myDBManager.CleanUp();
+
+            if(myOrder > 0)
+            { return true; }
+            else
+            { return false; }
+        }
 
     }
 }

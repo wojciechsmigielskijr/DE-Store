@@ -11,6 +11,7 @@
             Stock = stock;
         }
         public int WarehouseID { get; set; }
+        public int ProductTypeID { get; set; }
         public string ProductType { get; set; }
         public string ProductDescription { get; set; }
         public string LocationName { get; set; }

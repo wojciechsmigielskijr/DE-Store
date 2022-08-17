@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option csharp_namespace = "De_Store.Service.AnalysisReporting.Protos";
+
+package analysisreporting;
+
+service AnalysisReporter {
+  rpc GetSaleDataByProduct (SaleDataByProductRequest) returns (stream SaleDataByProductReply);
+  rpc RevenueByMonth (RevenueByMonthRequest) returns (stream RevenueByMonthReply);
+  rpc GetSalesByLocation (SalesByLocationRequest) returns (stream SalesByLocationReply);
+}
+
+message SaleDataByProductRequest {
+}
+
+message SaleDataByProductReply {
+  string productType = 1;
+  int32 productSales = 2;
+}
+
+message RevenueByMonthRequest {
+}
+
+message RevenueByMonthReply {
+  string monthYear = 1;
+  double totalSale = 2;
+}
+
+
+message SalesByLocationRequest {
+}
+
+message SalesByLocationReply {
+  string locationSold = 1;
+  int32 totalsSales = 2;
+}
+
