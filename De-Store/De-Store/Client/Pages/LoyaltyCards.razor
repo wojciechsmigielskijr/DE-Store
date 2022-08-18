@@ -1,5 +1,6 @@
 ﻿@page "/LoyaltyCards"
 @using De_Store.Service.LoyaltyCards.Protos
+@using Google.Protobuf.Collections
 @using Google.Protobuf.WellKnownTypes
 @using Grpc.Core
 @inject LoyaltyCardsCustomerService.LoyaltyCardsCustomerServiceClient loyaltyManager
@@ -8,7 +9,48 @@
 
 <h1>Loyalty Cards</h1>
 
-
+@if (loyaltyCards.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Card Type</th>
+                <th>Offers</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var l in loyaltyCards)
+            {
+                <tr @key="@l">
+                    <td id="CardID" value="@l.LoyaltyCardID" hidden></td>
+                    <td>@l.LoyaltyCardName</td>
+                    <td>
+                        <table>
+                             <thead>
+                                <tr>
+                                    <th>Offer Type</th>
+                                    <th>Offer Description</th>
+                                    <th>Offer Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var o in l.LoyaltyOffers)
+                                {                                     
+                                      <tr>
+                                          <td id="offerID" hidden>@o.Id</td>
+                                          <td>@o.OfferType</td>
+                                          <td>@o.OfferDescription</td>
+                                          <td>@o.OfferCost</td>
+                                      </tr>                         
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 <h2>Configure Offers for Loyalty Cards</h2>
 <!--
@@ -59,10 +101,12 @@ Users will be able to add a offer and Cost
 
 @code {
     private List<Customer> customers = new();
+    private List<LoyaltyCard> loyaltyCards = new();
 
     protected override async Task OnInitializedAsync()
     {
         await GetMyCustomers();
+        await GetLoyaltyCards();
     }
 
     private async Task GetMyCustomers()
@@ -84,6 +128,33 @@ Users will be able to add a offer and Cost
                 myCustomers.ResponseStream.Current.LoyaltyCardTypeID,
                 myCustomers.ResponseStream.Current.LoyaltyCardDescription )           
                 );
+        }
+    }
+
+    private async Task GetLoyaltyCards()
+    {
+        loyaltyCards.Clear();
+
+        using var myCards = loyaltyManager.GetLoyaltyCards(new GetLoyaltyCardsRequest());
+
+        while (await myCards.ResponseStream.MoveNext())
+        {
+            LoyaltyCard myNewCard = new LoyaltyCard();
+            myNewCard.LoyaltyCardID = myCards.ResponseStream.Current.Loyaltycardid;
+            myNewCard.LoyaltyCardName = myCards.ResponseStream.Current.Loyaltycardtype;
+
+            RepeatedField<LoyaltyOffer> loyaltyCardOffers = myCards.ResponseStream.Current.LoyaltyCardOffer;
+
+            List<LoyaltyCardOffer> myOffer = new();
+
+            foreach(LoyaltyOffer lo in loyaltyCardOffers)
+            {
+                 myOffer.Add(new LoyaltyCardOffer(lo.Loyaltycardofferid, lo.Offertype, lo.Offerdescription, lo.Offercost));                
+            }
+
+            myNewCard.LoyaltyOffers = myOffer;     
+
+            loyaltyCards.Add(myNewCard);
         }
     }
 
@@ -117,6 +188,37 @@ Users will be able to add a offer and Cost
         public int? CustomerLoyaltyCardTypeID { get; set; }
         public string LoyaltyCardTypeDescription { get; set; }
         public bool IsRevoked { get; set; }
+    }
 
+    public class LoyaltyCard
+    {
+        public LoyaltyCard(int loyaltyCardID, string loyaltyCardName, List<LoyaltyCardOffer> myOffers)
+        {
+            LoyaltyCardID = loyaltyCardID;
+            LoyaltyCardName = loyaltyCardName;
+            LoyaltyOffers = myOffers;
+        }
+
+        public LoyaltyCard() { }
+
+        public int LoyaltyCardID { get; set; }
+        public string LoyaltyCardName { get; set; }
+        public List<LoyaltyCardOffer> LoyaltyOffers { get; set;}
+    }
+
+    public class LoyaltyCardOffer
+    {
+        public LoyaltyCardOffer(int id, string offerType, string offerDescription, int offerCost)
+        {
+            Id = id;
+            OfferType = offerType;
+            OfferDescription = offerDescription;
+            OfferCost = offerCost;
+        }
+
+        public int Id { get; set; }
+        public string OfferType { get; set; }
+        public string OfferDescription { get; set; }
+        public int OfferCost { get; set; }
     }
 }

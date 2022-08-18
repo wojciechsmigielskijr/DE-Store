@@ -26,15 +26,42 @@ namespace De_Store.Service.LoyaltyCards.Services
 
         public override async Task GetLoyaltyCards(GetLoyaltyCardsRequest request, IServerStreamWriter<GetLoyaltyCardsReply> response, ServerCallContext context)
         {
+            LoyaltyCardManager myManager = new();
+
+            List<LoyaltyCard> myCards = myManager.GetLoyaltyCards();
+
+            foreach (LoyaltyCard c in myCards)
+            {
+                GetLoyaltyCardsReply myReply = new()
+                {
+                    Loyaltycardid = c.LoyaltyCardID,
+                    Loyaltycardtype = c.LoyaltyCardName
+                };
+
+                foreach (LoyaltyCardOffer lo in c.LoyaltyOffers)
+                {
+                    var myLoyaltyOffer = new LoyaltyOffer
+                    {
+                        Loyaltycardofferid = lo.Id,
+                        Offertype = lo.OfferType,
+                        Offerdescription = lo.OfferDescription,
+                        Offercost = lo.OfferCost
+                    };
+
+                    myReply.LoyaltyCardOffer.Add(myLoyaltyOffer);
+                }
+            
+                await response.WriteAsync(myReply);
+            }
+
             return;
         }
 
-
         public override async Task GetCustomers(CustomersRequest request, IServerStreamWriter<CustomersReply> response, ServerCallContext context)
         {
-            LoyaltyCardManager myModel = new();
+            LoyaltyCardManager myManager= new();
 
-            List<Customer> myCustomers = myModel.GetCustomers();
+            List<Customer> myCustomers = myManager.GetCustomers();
 
             foreach (Customer c in myCustomers)
             {
@@ -63,6 +90,11 @@ namespace De_Store.Service.LoyaltyCards.Services
         }
 
         public override async Task<RevokeLoyaltyCardReply> RevokeLoyaltyCard(RevokeLoyaltyCardRequest request, ServerCallContext context)
+        {
+            return new();
+        }
+
+        public override async Task<CreateOfferReply> CreateOffer(CreateOfferRequest request, ServerCallContext context)
         {
             return new();
         }
