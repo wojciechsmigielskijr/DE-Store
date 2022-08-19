@@ -1,4 +1,3 @@
-using De_Store.Shared.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,11 +41,6 @@ app.UseGrpcWeb();
 
 app.MapRazorPages();
 app.MapControllers();
-app.MapGrpcService<PriceService>().EnableGrpcWeb();
-app.MapGrpcService<AnalysisReportingService>().EnableGrpcWeb();
-app.MapGrpcService<FinanceService>().EnableGrpcWeb();
-app.MapGrpcService<InventoryService>().EnableGrpcWeb();
-app.MapGrpcService<LoyaltyService>().EnableGrpcWeb();
 app.MapFallbackToFile("index.html");
 
 app.Run();
