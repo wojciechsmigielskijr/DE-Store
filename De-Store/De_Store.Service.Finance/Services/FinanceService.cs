@@ -3,10 +3,10 @@ using Grpc.Core;
 
 namespace De_Store.Service.Finance.Services
 {
-    public class GreeterService : Greeter.GreeterBase
+    public class FinanceService : Greeter.GreeterBase
     {
-        private readonly ILogger<GreeterService> _logger;
-        public GreeterService(ILogger<GreeterService> logger)
+        private readonly ILogger<FinanceService> _logger;
+        public FinanceService(ILogger<FinanceService> logger)
         {
             _logger = logger;
         }

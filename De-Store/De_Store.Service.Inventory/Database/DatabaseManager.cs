@@ -8,11 +8,12 @@ namespace De_Store.Service.Inventory.Database
         {
             Initialise();
         }
-        public string? DatabaseConnectionString { get; set; }
+
+        private string? DatabaseConnectionString { get; set; }
 
         public SqlConnection? SQLConnection { get; set; }
 
-        public void Initialise()
+        private void Initialise()
         {
             DatabaseConnectionString = "Data Source=WOJCIECHSDESK\\WOJCIECHSDESK;Initial Catalog=De-Store;Integrated Security=True";
             SQLConnection = new SqlConnection(DatabaseConnectionString);

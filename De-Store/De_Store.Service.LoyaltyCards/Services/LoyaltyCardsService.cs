@@ -106,5 +106,10 @@ namespace De_Store.Service.LoyaltyCards.Services
 
             return new();
         }
+
+        public override async Task GetOffers(GetOffersRequest request, IServerStreamWriter<LoyaltyOffer> response, ServerCallContext context)
+        {
+            return;
+        }
     }
 }

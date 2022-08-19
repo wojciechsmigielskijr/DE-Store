@@ -14,6 +14,7 @@ service LoyaltyCardsCustomerService {
   rpc GetCustomers (CustomersRequest) returns (stream CustomersReply);
   rpc GiveCustomerLoyaltyCard (AssignCustomerLoyaltyCardRequest) returns (AssignCustomerLoyaltyCardReply);
   rpc RevokeLoyaltyCard (RevokeLoyaltyCardRequest) returns (RevokeLoyaltyCardReply);
+  rpc GetOffers (GetOffersRequest) returns (stream LoyaltyOffer);
 }
 
 message GetOffersForLoyaltyCardsRequest { }
@@ -82,5 +83,9 @@ message CreateOfferRequest {
 }
 
 message CreateOfferReply {
+
+}
+
+message GetOffersRequest {
 
 }

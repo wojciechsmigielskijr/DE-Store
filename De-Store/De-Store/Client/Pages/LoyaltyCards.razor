@@ -26,7 +26,7 @@
                     <td id="CardID" value="@l.LoyaltyCardID" hidden></td>
                     <td>@l.LoyaltyCardName</td>
                     <td>
-                        <table>
+                        <table class="table">
                              <thead>
                                 <tr>
                                     <th>Offer Type</th>
@@ -38,7 +38,7 @@
                             <tbody>
                                 @foreach (var o in l.LoyaltyOffers)
                                 {                                     
-                                      <tr>
+                                      <tr class="loyaltyOfferRow">
                                           <td id="offerID" hidden>@o.Id</td>
                                           <td>@o.OfferType</td>
                                           <td>@o.OfferDescription</td>
@@ -60,37 +60,32 @@
 <EditForm EditContext="@myCreateOfferContext" OnValidSubmit="@AddOffer">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <label>Offer Type: <input @bind-value="myOfferModel.OfferType"/></label>
+    <label>Offer Type: <input style="padding-left: 5px; padding-right: 10px" @bind-value="myOfferModel.OfferType"/></label>
     
-    <label>Offer Description: <input @bind-value="myOfferModel.OfferDescription"/></label>
+    <label>Offer Description: <input style="padding-left: 5px; padding-right: 10px" @bind-value="myOfferModel.OfferDescription"/></label>
     
-    <label>Offer Cost: <input @bind-value="myOfferModel.OfferCost"/></label>
+    <label>Offer Cost: <input style="padding-left: 5px; padding-right: 10px" @bind-value="myOfferModel.OfferCost"/></label>
     
     <button type="submit">Create Offer</button>
 </EditForm>
-<!--
-Users will be able to add a offer and Cost 
--->
 
 <h2>Configure Offers for Loyalty Cards</h2>
-<!--
-<EditForm EditContext="@myAddOfferContext" OnValidSubmit="@AddOfferForCard">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
     <label>Card Type: 
-        <InputSelect @bind-value="myOfferModel.OfferDescription"> </InputSelect>     
-    </label>
-    
-    <label>Offer Type: 
-        <InputSelect @bind-value="myOfferModel.OfferDescription"> </InputSelect>    
+          <select @onchange="(e) => { newLoyaltyCardID = Convert.ToInt16(e.Value);}">
+                  @foreach(var c in loyaltyCards)
+                  {
+                     <option value="@c.LoyaltyCardID" selected>@c.LoyaltyCardName</option>
+                  }
+          </select>  
     </label>
 
-    
-    <button type="submit">Add Offer To Card</button>
-</EditForm> -->
-<!--
-This will contain each loyalty card with in a table row and users will be able to add a new tag for the lyoalty card
--->
+    <label>Offer Type: 
+          <select @onchange="(e) => { newOfferID = Convert.ToInt16(e.Value);}">
+
+          </select>  
+    </label>
+                  
+    <button type="submit">Assign Offer</button>
 
 <h2>Customers</h2>
 
@@ -131,10 +126,14 @@ This will contain each loyalty card with in a table row and users will be able t
 @code {
     private List<Customer> customers = new();
     private List<LoyaltyCard> loyaltyCards = new();
+    private List<LoyaltyCardOffer> loyaltyCardOffers = new();
     private int offerID;
     private EditContext? myCreateOfferContext;
     private EditContext? myAddOfferContext;
     private LoyaltyCardOfferModel myOfferModel = new();
+
+    private int newLoyaltyCardID;
+    private int newOfferID;
 
 
     protected override async Task OnInitializedAsync()
@@ -164,7 +163,7 @@ This will contain each loyalty card with in a table row and users will be able t
 
     private async Task AddOfferForCard()
     {
-        
+
     }
 
     private async Task GetMyCustomers()
@@ -294,4 +293,5 @@ This will contain each loyalty card with in a table row and users will be able t
         [Range(1, 2000, ErrorMessage = "Offer Cost invalid (1-2000).")]
         public int OfferCost { get; set; }
     }
-}
+
+ }

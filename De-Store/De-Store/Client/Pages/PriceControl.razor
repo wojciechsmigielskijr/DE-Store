@@ -73,7 +73,7 @@
                await GetOffers();
                StateHasChanged();
             });
-        }, null, 0, 1000);
+        }, null, 0, 5000);
     }
 
     private async Task GetMyProducts()
@@ -114,17 +114,23 @@
     private async Task ToggleAvailableToBuy(Product p)
     {
         await productManager.UpdateAvailableAsync(new UpdateAvailableRequest() { ProductID = p.ProductID, AvailableToBuy = NewCheckboxValue });
+        await GetMyProducts();
+        StateHasChanged();
     }
 
     private async Task ChangePrice(Product p)
     {
         if (NewCost != p.ProductCost)
         { await productManager.UpdatePriceAsync(new UpdatePriceRequest() { ProductID = p.ProductID, ProductCost = NewCost }); }
+        await GetMyProducts();
+        StateHasChanged();
     }
 
     private async Task ChangeOffer(Product p)
     {
         await productManager.UpdateOfferAsync(new UpdateOfferRequest() { ProductID = p.ProductID, OfferID = NewOfferID });
+        await GetMyProducts();
+        StateHasChanged();
     }
 
     public class Product

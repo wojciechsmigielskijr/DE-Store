@@ -6,9 +6,7 @@ namespace De_Store.Service.Inventory.Manager
     public class StockManager
     {
         public StockManager()
-        {
-
-        }
+        { }
 
         public async Task CheckStockAsync()
         {
