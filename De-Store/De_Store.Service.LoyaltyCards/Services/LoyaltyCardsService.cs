@@ -19,9 +19,13 @@ namespace De_Store.Service.LoyaltyCards.Services
             return;
         }
 
-        public override async Task<SetOffersForLoyaltyCardsReply> SetOfferForLoyaltyCard(SetOffersForLoyaltyCardsRequest request, ServerCallContext context)
+        public override async Task<RemoveOfferForLoyaltyCardsReply> RemoveOffer(RemoveOfferForLoyaltyCardsRequest request, ServerCallContext context)
         {
-            return new SetOffersForLoyaltyCardsReply();
+            LoyaltyCardManager myManager = new();
+
+            myManager.RemoveLoyaltyCardOffer(request.Loyaltycardid, request.Loyaltycardofferid);
+
+            return new RemoveOfferForLoyaltyCardsReply();
         }
 
         public override async Task GetLoyaltyCards(GetLoyaltyCardsRequest request, IServerStreamWriter<GetLoyaltyCardsReply> response, ServerCallContext context)
@@ -96,6 +100,10 @@ namespace De_Store.Service.LoyaltyCards.Services
 
         public override async Task<CreateOfferReply> CreateOffer(CreateOfferRequest request, ServerCallContext context)
         {
+            LoyaltyCardManager myManager = new();
+
+            myManager.CreateNewOffer(request.OfferType, request.OfferDescription, request.OfferCost);
+
             return new();
         }
     }

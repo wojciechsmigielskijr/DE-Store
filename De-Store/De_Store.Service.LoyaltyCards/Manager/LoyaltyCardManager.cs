@@ -12,9 +12,9 @@ namespace De_Store.Service.LoyaltyCards.Manager
 
             myDBManager.SQLConnection.Open();
 
-            string myLoyaltyCardsCommand = @"SELECT LC.ID, LC.CardType, LT.OfferType, LT.OfferDescription, LT.OfferLoyaltyCost, LT.ID as OfferID FROM LoyaltyCards LC
-                                                LEFT JOIN LoyaltyCardOffers LO ON LO.LoyatyCardID = LC.ID 
-                                                LEFT JOIN LoyaltyCardOfferTypes LT ON LO.LoyaltyCardOfferID = LT.ID";
+            string myLoyaltyCardsCommand = @"SELECT LC.ID, LC.CardType, LT.OfferType, LT.OfferDescription, LT.OfferLoyaltyCost, LT.ID as OfferID FROM [De-Store].[dbo].[LoyaltyCards] LC
+                                                LEFT JOIN [De-Store].[dbo].LoyaltyCardOffers LO ON LO.LoyatyCardID = LC.ID 
+                                                LEFT JOIN [De-Store].[dbo].LoyaltyCardOfferTypes LT ON LO.LoyaltyCardOfferID = LT.ID";
 
             SqlCommand myCardsCommand = new(myLoyaltyCardsCommand, myDBManager.SQLConnection);
 
@@ -32,18 +32,15 @@ namespace De_Store.Service.LoyaltyCards.Manager
             {
                 if (int.TryParse(myCardsReader[0].ToString(), out int myCurrentCardID) && int.TryParse(myCardsReader[4].ToString(), out int myCost) && int.TryParse(myCardsReader[5].ToString(), out int myOfferID))
                 {
-                    if (myCurrentCardID == myLastCardID)
+                    if(myCards.Any(a => a.LoyaltyCardID == myCurrentCardID))
                     {
-                        myOffers.Add(new(myOfferID, offerType: myCardsReader[2].ToString(), offerDescription: myCardsReader[3].ToString(), offerCost: myCost));
-                        myLastCardName = myCardsReader[1].ToString();
+                        myCards.Find(a => a.LoyaltyCardID == myCurrentCardID).LoyaltyOffers.Add(new(myOfferID, offerType: myCardsReader[2].ToString(), offerDescription: myCardsReader[3].ToString(), offerCost: myCost));
                     }
                     else
                     {
-                        myCards.Add(new(myLastCardID, myLastCardName, myOffers));
-                        myOffers.Clear();
-                        myLastCardName = myCardsReader[1].ToString();
-                        myLastCardID = myCurrentCardID;
-                    }
+                        myCards.Add(new(myCurrentCardID, myCardsReader[1].ToString(), new()));
+                        myCards.Find(a => a.LoyaltyCardID == myCurrentCardID).LoyaltyOffers.Add(new(myOfferID, offerType: myCardsReader[2].ToString(), offerDescription: myCardsReader[3].ToString(), offerCost: myCost));
+                    };
                 };
             }
 
@@ -83,11 +80,26 @@ namespace De_Store.Service.LoyaltyCards.Manager
             return myOffers;
         }
 
-        public void SetLoyaltyCardOffer(int loyaltyCardID, int loyaltyCardOffer)
+        public void RemoveLoyaltyCardOffer(int loyaltyCardID, int loyaltyCardOfferID)
         {
             DatabaseManager myDBManager = new();
 
-            string commandText = "UPDATE [De-Store].[dbo].[CustomerLoyaltyCards] SET Revoked = 1 WHERE CustomerID = " + loyaltyCardID;
+            string commandText = "DELETE FROM [De-Store].[dbo].[LoyaltyCardOffers] WHERE LoyatyCardID = " + loyaltyCardID + " AND LoyaltyCardOfferID = " + loyaltyCardOfferID;
+
+            SqlCommand cmd = new(commandText, myDBManager.SQLConnection);
+
+            myDBManager.SQLConnection.Open();
+
+            cmd.ExecuteNonQuery();
+
+            myDBManager.CleanUp();
+        }
+
+        public void CreateNewOffer(string offerType, string offerDescription, int offerCost)
+        {
+            DatabaseManager myDBManager = new();
+
+            string commandText = $"INSERT INTO [De-Store].[dbo].[LoyaltyCardOfferTypes] (OfferType, OfferDescription, OfferLoyaltyCost) VALUES ('{offerType}', '{offerDescription}', {offerCost})";
 
             SqlCommand cmd = new(commandText, myDBManager.SQLConnection);
 

@@ -3,6 +3,7 @@
 @using Google.Protobuf.Collections
 @using Google.Protobuf.WellKnownTypes
 @using Grpc.Core
+@using System.ComponentModel.DataAnnotations
 @inject LoyaltyCardsCustomerService.LoyaltyCardsCustomerServiceClient loyaltyManager
 
 <PageTitle>Loyalty Cards</PageTitle>
@@ -31,6 +32,7 @@
                                     <th>Offer Type</th>
                                     <th>Offer Description</th>
                                     <th>Offer Cost</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,6 +43,7 @@
                                           <td>@o.OfferType</td>
                                           <td>@o.OfferDescription</td>
                                           <td>@o.OfferCost</td>
+                                          <td><button @onclick="() => { RemoveOffer(l.LoyaltyCardID, o.Id); }">Remove Offer</button></td>
                                       </tr>                         
                                 }
                             </tbody>
@@ -52,14 +55,41 @@
     </table>
 }
 
-<h2>Configure Offers for Loyalty Cards</h2>
-<!--
-This will contain each loyalty card with in a table row and users will be able to add a new tag for the lyoalty card
--->
 
 <h2>Add Offers</h2>
+<EditForm EditContext="@myCreateOfferContext" OnValidSubmit="@AddOffer">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label>Offer Type: <input @bind-value="myOfferModel.OfferType"/></label>
+    
+    <label>Offer Description: <input @bind-value="myOfferModel.OfferDescription"/></label>
+    
+    <label>Offer Cost: <input @bind-value="myOfferModel.OfferCost"/></label>
+    
+    <button type="submit">Create Offer</button>
+</EditForm>
 <!--
 Users will be able to add a offer and Cost 
+-->
+
+<h2>Configure Offers for Loyalty Cards</h2>
+<!--
+<EditForm EditContext="@myAddOfferContext" OnValidSubmit="@AddOfferForCard">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label>Card Type: 
+        <InputSelect @bind-value="myOfferModel.OfferDescription"> </InputSelect>     
+    </label>
+    
+    <label>Offer Type: 
+        <InputSelect @bind-value="myOfferModel.OfferDescription"> </InputSelect>    
+    </label>
+
+    
+    <button type="submit">Add Offer To Card</button>
+</EditForm> -->
+<!--
+This will contain each loyalty card with in a table row and users will be able to add a new tag for the lyoalty card
 -->
 
 <h2>Customers</h2>
@@ -98,15 +128,43 @@ Users will be able to add a offer and Cost
 }
 
 
-
 @code {
     private List<Customer> customers = new();
     private List<LoyaltyCard> loyaltyCards = new();
+    private int offerID;
+    private EditContext? myCreateOfferContext;
+    private EditContext? myAddOfferContext;
+    private LoyaltyCardOfferModel myOfferModel = new();
+
 
     protected override async Task OnInitializedAsync()
     {
+        myCreateOfferContext = new(myOfferModel);
         await GetMyCustomers();
         await GetLoyaltyCards();
+    }
+
+    private async Task RemoveOffer(int loyaltyID, int offerID)
+    {
+        await loyaltyManager.RemoveOfferAsync(new RemoveOfferForLoyaltyCardsRequest() { Loyaltycardid = loyaltyID, Loyaltycardofferid = offerID });
+        await GetLoyaltyCards();
+        StateHasChanged();
+    }
+
+    private async Task AddOffer()
+    {
+        if (myCreateOfferContext != null && myCreateOfferContext.Validate())
+        {
+            await loyaltyManager.CreateOfferAsync(new CreateOfferRequest() { OfferType = this.myOfferModel.OfferType, OfferDescription = this.myOfferModel.OfferDescription, OfferCost = this.myOfferModel.OfferCost});
+            await Task.CompletedTask;
+        }
+
+        return;
+    }
+
+    private async Task AddOfferForCard()
+    {
+        
     }
 
     private async Task GetMyCustomers()
@@ -129,6 +187,8 @@ Users will be able to add a offer and Cost
                 myCustomers.ResponseStream.Current.LoyaltyCardDescription )           
                 );
         }
+
+        return;
     }
 
     private async Task GetLoyaltyCards()
@@ -149,7 +209,7 @@ Users will be able to add a offer and Cost
 
             foreach(LoyaltyOffer lo in loyaltyCardOffers)
             {
-                 myOffer.Add(new LoyaltyCardOffer(lo.Loyaltycardofferid, lo.Offertype, lo.Offerdescription, lo.Offercost));                
+                myOffer.Add(new LoyaltyCardOffer(lo.Loyaltycardofferid, lo.Offertype, lo.Offerdescription, lo.Offercost));                
             }
 
             myNewCard.LoyaltyOffers = myOffer;     
@@ -219,6 +279,19 @@ Users will be able to add a offer and Cost
         public int Id { get; set; }
         public string OfferType { get; set; }
         public string OfferDescription { get; set; }
+        public int OfferCost { get; set; }
+    }
+
+    public class LoyaltyCardOfferModel
+    {
+        [Required]
+        [StringLength(10, ErrorMessage = "Offer Type is too long.")]
+        public string? OfferType { get; set; }
+        [Required]
+        [StringLength(50, ErrorMessage = "Offer Description is too long.")]
+        public string? OfferDescription { get; set; }
+
+        [Range(1, 2000, ErrorMessage = "Offer Cost invalid (1-2000).")]
         public int OfferCost { get; set; }
     }
 }

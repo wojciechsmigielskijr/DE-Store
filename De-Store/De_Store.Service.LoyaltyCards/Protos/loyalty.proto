@@ -9,7 +9,7 @@ import "google/protobuf/wrappers.proto";
 service LoyaltyCardsCustomerService {
   rpc GetOffersForLoyaltyCard (GetOffersForLoyaltyCardsRequest) returns (stream GetOffersForLoyaltyCardsReply);
   rpc CreateOffer (CreateOfferRequest) returns (CreateOfferReply);
-  rpc SetOfferForLoyaltyCard (SetOffersForLoyaltyCardsRequest) returns (SetOffersForLoyaltyCardsReply);
+  rpc RemoveOffer (RemoveOfferForLoyaltyCardsRequest) returns (RemoveOfferForLoyaltyCardsReply);
   rpc GetLoyaltyCards (GetLoyaltyCardsRequest) returns (stream GetLoyaltyCardsReply);
   rpc GetCustomers (CustomersRequest) returns (stream CustomersReply);
   rpc GiveCustomerLoyaltyCard (AssignCustomerLoyaltyCardRequest) returns (AssignCustomerLoyaltyCardReply);
@@ -39,12 +39,12 @@ message LoyaltyOffer {
   int32 offercost = 4;
 }
 
-message SetOffersForLoyaltyCardsRequest { 
+message RemoveOfferForLoyaltyCardsRequest { 
 	int32 loyaltycardid = 1;
 	int32 loyaltycardofferid = 2;
 }
 
-message SetOffersForLoyaltyCardsReply { }
+message RemoveOfferForLoyaltyCardsReply { }
 
 
 message CustomersRequest { }
